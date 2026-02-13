@@ -1,33 +1,53 @@
 <?php
 
+// Set JSON content type header
+header('Content-Type: application/json');
+
 // Database credentials
 $host = 'localhost';
 $username = 'root';
 $password = '';
 $database = 'mobileapps_2026B_thomas_parker';
 
-// Create connection
-$conn = new mysqli($host, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    die(json_encode([
-        'success' => false,
-        'error' => 'Connection failed: ' . $conn->connect_error,
-        'host' => $host,
-        'database' => $database
-    ]));
+/**
+ * Get database connection
+ * Returns mysqli connection object
+ */
+function getDBConnection() {
+    global $host, $username, $password, $database;
+    
+    $conn = new mysqli($host, $username, $password, $database);
+    
+    if ($conn->connect_error) {
+        sendError('Connection failed: ' . $conn->connect_error);
+    }
+    
+    return $conn;
 }
 
-// Connection successful
-echo json_encode([
-    'success' => true,
-    'message' => 'Database connection successful!',
-    'host' => $host,
-    'database' => $database,
-    'connection' => 'Active'
-]);
+/**
+ * Send JSON success response
+ * @param mixed $data Optional data to include in response
+ */
+function sendSuccess($data = null) {
+    $response = ['success' => true];
+    if ($data !== null) {
+        $response['data'] = $data;
+    }
+    echo json_encode($response);
+    exit;
+}
 
-// Close connection
-$conn->close();
+/**
+ * Send JSON error response
+ * @param string $message Error message
+ */
+function sendError($message) {
+    echo json_encode([
+        'success' => false,
+        'error' => $message
+    ]);
+    exit;
+}
+
 ?>
